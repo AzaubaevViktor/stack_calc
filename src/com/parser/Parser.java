@@ -1,12 +1,7 @@
 package com.parser;
-import com.parser.Line;
 
 import java.util.ArrayList;
-
-/**
- * Created by `ktulhy` on 2/17/15.
- */
-
+import java.lang.Character;
 
 public class Parser {
     public ArrayList<Line> lines;
@@ -15,19 +10,23 @@ public class Parser {
         lines = new ArrayList<Line>();
     }
 
-    public void parse(long lineN, String str) {
-        Line line = new Line(lineN);
+    public void parseLine(int lineN, String lineStr) {
+        Line line = new Line(lineN, lineStr);
 
-        Character ch = '\0';
-        Token token = new Token(0, "");
-        for (int pos = 0; pos < str.length(); pos++) {
-            ch = str.charAt(pos);
-            if (ch.equals(' ')) {
+        Character ch;
+        Token token = new Token(line, lineN, 0, "");
+        for (int pos = 0; pos < lineStr.length(); pos++) {
+            ch = lineStr.charAt(pos);
+
+            if (Character.isWhitespace(ch)) {
                 line.add(token);
-                token = new Token(pos + 1, "");
+                token = new Token(line, lineN, pos + 1, "");
             } else {
                 token.add(ch);
             }
+        }
+        if (!token.isEmpty()) {
+            line.add(token);
         }
         lines.add(line);
     }

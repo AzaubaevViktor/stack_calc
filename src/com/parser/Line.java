@@ -1,31 +1,36 @@
 package com.parser;
-import com.parser.Token;
-import com.sun.istack.internal.NotNull;
 
 import java.util.ArrayList;
 
-/**
- * Created by `ktulhy` on 2/17/15.
- */
 public class Line {
-    public long lineN = 0;
-    ArrayList<Token> tokens;
+    public int lineN = 0;
+    public ArrayList<Token> tokens;
+    public String originalLine;
 
-    public Line(long lineN) {
+    public Line(int lineN, String originalLine) {
         this.lineN = lineN;
+        this.originalLine = originalLine;
         this.tokens = new ArrayList<Token>();
     }
 
-    public Line(long lineN, ArrayList<Token> tokens) {
+    public Line(int lineN, String originalLine, ArrayList<Token> tokens) {
         this.lineN = lineN;
+        this.originalLine = originalLine;
         this.tokens = tokens;
     }
 
     public void add(Token token) {
+        token.typecast();
         tokens.add(token);
     }
 
+    public Token[] getTokens() {
+        Token[] tokensArr = new Token[tokens.size()];
+        tokens.toArray(tokensArr);
+        return tokensArr;
+    }
+
     public String toString() {
-        return String.format("#%d:`%s`#", lineN, tokens);
+        return String.format("L%d:%s", lineN, tokens);
     }
 }
