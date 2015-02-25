@@ -1,8 +1,8 @@
 package com.calc;
 
-
 import com.parser.Line;
 import com.parser.Parser;
+import com.semantic.*;
 
 import java.io.*;
 
@@ -30,6 +30,15 @@ public class Main {
 
         String lineStr = "";
         Parser parser = new Parser();
+        Generator generator = new Generator();
+
+        try {
+            generator.loadConfig();
+        } catch (IOException e) {
+            System.out.println("!E Error loading config file");
+        } catch (ConfigErrorException e) {
+            System.out.println("!E Error loading config file");
+        }
 
         if (systemInput) {
             System.out.print("Interactive mode, Stack Calc v-.-.-\n");
@@ -43,6 +52,26 @@ public class Main {
                 if ((null == lineStr) || lineStr.equals("exit")) break;
 
                 Line lineTokens = parser.parseLine(0, lineStr);
+
+                try {
+                    Command cmd = generator.parse(lineTokens);
+                } catch (UnknownCommandException e) {
+                    System.out.println(
+                            lineTokens.errorString(
+                                    e.token,
+                                    "Unknown Command"));
+                } catch (WrongArgumentsException e) {
+                    System.out.println(
+                            lineTokens.errorString(
+                                    e.token,
+                                    "Wrong Argument"));
+                } catch (ClassNotFoundException e) {
+                    System.out.print(e.toString());
+                } catch (InstantiationException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
 
                 System.out.printf("!D `%s`\n", lineTokens);
 

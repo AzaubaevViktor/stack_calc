@@ -3,32 +3,51 @@ package com.semantic;
 import com.parser.File;
 import com.parser.Line;
 import com.parser.Token;
-import com.semantic.commands.push.PushCreator;
+import com.semantic.commands.Push;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
 
 public class Generator {
-    CommandCreator[] commandCreators = {
-            new PushCreator()
-    };
-    Hashtable<String, CommandCreator> creatorsHashtable = new Hashtable<String, CommandCreator>();
-    ArrayList<Command> cmds = new ArrayList<Command>();
+    Hashtable<String, String> creatorsHashtable = new Hashtable<String, String>();
 
-    public Generator(File file) throws UnknownCommandException, WrongArgumentsException {
-        for (CommandCreator creator: commandCreators) {
-            creatorsHashtable.put(creator.commandName(), creator);
+    public void loadConfig() throws IOException, ConfigErrorException {
+        InputStream commandsResources = System.class.getResourceAsStream("/com/semantic/config");
+        if (null == commandsResources) {
+            throw new IOException();
         }
+        BufferedReader reader = new BufferedReader(new InputStreamReader(commandsResources));
+        String lineStr;
+        String[] parsedLine;
 
-        for (Line line: file.getLines()) {
-            Token[] tokens = line.getTokens();
-            if (!creatorsHashtable.containsKey(tokens[0].str)) {
-                throw new UnknownCommandException(tokens[0]);
+        while (true) {
+            lineStr = reader.readLine();
+            if ((null == lineStr) || lineStr.equals("exit")) break;
+            parsedLine = lineStr.split(":");
+            if (2 != parsedLine.length) {
+                throw new ConfigErrorException(lineStr);
             }
-            cmds.add(
-                    creatorsHashtable.get(tokens[0].str).lineHandler(line)
-            );
+            creatorsHashtable.put(parsedLine[0], parsedLine[1]);
         }
+    }
+
+    public Command parse(Line lineTokens) throws UnknownCommandException, ClassNotFoundException, IllegalAccessException, InstantiationException, WrongArgumentsException {
+
+
+
+        Token[] tokens = lineTokens.getTokens();
+        if (!creatorsHashtable.containsKey(tokens[0].str)) {
+            throw new UnknownCommandException(tokens[0]);
+        }
+
+        Class<?> loaded = Class.forName(creatorsHashtable.get(tokens[0].str));
+        Command cmd = (Command) loaded.newInstance();
+        cmd.init(lineTokens);
+        return cmd;
     }
 }

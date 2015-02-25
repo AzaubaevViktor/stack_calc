@@ -1,14 +1,27 @@
 package com.semantic;
 
+import com.parser.Token;
+
 public class WrongArgumentsException extends Exception {
-    public boolean toMany = false;
-    public boolean toFew = false;
-    public int incorrect = -1;
+    public final boolean toMany;
+    public final boolean toFew;
+    public final Token token;
+
     public WrongArgumentsException(boolean isToMany,
                                    boolean isToFew,
-                                   int nIncorrect) {
+                                   Token token) {
         toMany = isToMany;
         toFew = isToFew;
-        incorrect = nIncorrect;
+        this.token = token;
+    }
+
+    public String toString() {
+        if (toMany) {
+            return "To many arguments";
+        } else if (toFew) {
+            return "To less arguments";
+        } else {
+            return "Incorrect argument";
+        }
     }
 }

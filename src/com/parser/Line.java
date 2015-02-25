@@ -30,6 +30,17 @@ public class Line {
         return tokensArr;
     }
 
+    public String errorString(Token token, String msg) {
+        StringBuffer indent = new StringBuffer();
+        for (int i = 0; i < token.pos; i++) {
+            indent.append(' ');
+        }
+        for (int i = 0; i < token.str.length(); i++) {
+            indent.append('^');
+        }
+        return String.format("%s\n%s %s", originalLine, indent, msg);
+    }
+
     public String toString() {
         return String.format("L%d:%s", lineN, tokens);
     }
