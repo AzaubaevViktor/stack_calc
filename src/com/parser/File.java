@@ -21,9 +21,10 @@ public class File {
     }
 
     public Line[] getLines() {
-        Line[] lines = new Line[parser.lines.size()];
-        parser.lines.toArray(lines);
-        return lines;
+//        Line[] lines = new Line[parser.lines.size()];
+//        parser.lines.toArray(lines);
+//        return lines;
+        return null;
     }
 
     public String errorString(Token token, String msg) {
@@ -39,6 +40,6 @@ public class File {
     }
 
     public String toString() {
-        return String.format("F`%s`:\n%s", filename, parser.lines);
+        return String.format("F`%s`:\n%s", filename, null);
     }
 }

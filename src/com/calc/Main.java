@@ -1,41 +1,54 @@
 package com.calc;
 
 
-import com.parser.File;
-import com.semantic.Generator;
-import com.semantic.UnknownCommandException;
-import com.semantic.WrongArgumentsException;
+import com.parser.Line;
+import com.parser.Parser;
 
-import java.io.IOException;
+import java.io.*;
 
 public class Main {
 
-    public static void main(String[] args) throws UnknownCommandException, WrongArgumentsException {
+    public static void main(String[] args) {
 	// write your code here
-        File file;
+        InputStream in;
+        boolean systemInput;
+
         if (args.length < 1) {
-            System.out.print("!E Use: stack_calc filename");
-            return;
+            in = System.in;
+            systemInput = true;
+        } else {
+            try {
+                in = new FileInputStream(new File(args[0]));
+                systemInput = false;
+            } catch (FileNotFoundException e) {
+                System.out.printf("!E File `%s` not found:\n   %s\n", args[0], e);
+                return;
+            }
+        }
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+
+        String lineStr = "";
+        Parser parser = new Parser();
+
+        if (systemInput) {
+            System.out.print("Interactive mode, Stack Calc v-.-.-\n");
         }
 
         try {
-            file = new File(args[0]);
+            while (true) {
+                if (systemInput) System.out.print("> ");
+
+                lineStr = reader.readLine();
+                if ((null == lineStr) || lineStr.equals("exit")) break;
+
+                Line lineTokens = parser.parseLine(0, lineStr);
+
+                System.out.printf("!D `%s`\n", lineTokens);
+
+            }
         } catch (IOException e) {
-            System.out.printf("Error open file `%s`:\n!E %s", args[0], e);
-            return;
-        }
-
-        System.out.print(file);
-        System.out.print("\n");
-
-        Generator generator;
-        try {
-            generator = new Generator(file);
-        } catch (UnknownCommandException e) {
-            System.out.print(file.errorString(e.token, "!E Unknown command"));
-        } catch (WrongArgumentsException e) {
-            // TODO: Сделать нормальную обработку
-            System.out.print("WATAFUCK ARGUMENT");
+            System.out.printf("!E %s\n", e);
         }
 
 

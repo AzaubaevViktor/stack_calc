@@ -1,16 +1,9 @@
 package com.parser;
 
-import java.util.ArrayList;
 import java.lang.Character;
 
 public class Parser {
-    public ArrayList<Line> lines;
-
-    public Parser() {
-        lines = new ArrayList<Line>();
-    }
-
-    public void parseLine(int lineN, String lineStr) {
+    public Line parseLine(int lineN, String lineStr) {
         Line line = new Line(lineN, lineStr);
 
         Character ch;
@@ -25,9 +18,11 @@ public class Parser {
                 token.add(ch);
             }
         }
+
         if (!token.isEmpty()) {
             line.add(token);
         }
-        lines.add(line);
+
+        return line;
     }
 }
